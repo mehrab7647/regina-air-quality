@@ -16,15 +16,35 @@ export default function App() {
   }, [theme])
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/current")
-      .then(r => r.json()).then(setCurrent)
-      .catch(() => setError("Could not reach backend. Is it running?"))
+    const controller = new AbortController()
 
-    fetch("http://localhost:8000/api/history")
-      .then(r => r.json()).then(setHistory)
+    async function getJson(path) {
+      const response = await fetch(path, { signal: controller.signal })
+      if (!response.ok) throw new Error(`Request failed with status ${response.status}`)
+      return response.json()
+    }
 
-    fetch("http://localhost:8000/api/wind")
-      .then(r => r.json()).then(setWind)
+    async function loadDashboard() {
+      const [currentResult, historyResult, windResult] = await Promise.allSettled([
+        getJson("/api/current"),
+        getJson("/api/history"),
+        getJson("/api/wind"),
+      ])
+
+      if (controller.signal.aborted) return
+
+      if (currentResult.status === "rejected") {
+        setError("Live air-quality data is temporarily unavailable. Please try again shortly.")
+        return
+      }
+
+      setCurrent(currentResult.value)
+      if (historyResult.status === "fulfilled") setHistory(historyResult.value)
+      if (windResult.status === "fulfilled") setWind(windResult.value)
+    }
+
+    loadDashboard()
+    return () => controller.abort()
   }, [])
 
   if (error) return <p style={{padding:"2rem", color:"var(--color-high)"}}>{error}</p>

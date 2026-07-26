@@ -4,6 +4,20 @@ import {
 } from "recharts"
 
 export default function HistoryChart({ data }) {
+  if (!data.length) {
+    return (
+      <div style={{
+        background: "var(--color-surface)",
+        border: "1px solid var(--color-border)",
+        borderRadius: 16, padding: "1.5rem"
+      }}>
+        <p style={{fontSize:13, color:"var(--color-text-secondary)", margin:0}}>
+          Historical readings are temporarily unavailable.
+        </p>
+      </div>
+    )
+  }
+
   const formatted = data.map(d => ({
     time: new Date(d.time).toLocaleDateString("en-CA", {
       month: "short", day: "numeric", hour: "2-digit"
