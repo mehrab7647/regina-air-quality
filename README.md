@@ -2,7 +2,7 @@
 
 A live dashboard showing air quality and wind conditions for Regina, Saskatchewan. Built with a FastAPI backend pulling from Environment Canada's public AQHI feed and an Open-Meteo wind API, and a React frontend with an animated wind particle map.
 
-![screenshot](frontend/public/screenshot.png)
+![screenshot](frontend/public/yqrair.png)
 
 **Live site:** https://agent-6a6668d63416d238da5ae347--yqrair.netlify.app/
 
