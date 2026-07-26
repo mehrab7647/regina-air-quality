@@ -5,7 +5,6 @@ A live dashboard showing air quality and wind conditions for Regina, Saskatchewa
 ![screenshot](frontend/public/screenshot.png)
 
 **Live site:** https://agent-6a6668d63416d238da5ae347--yqrair.netlify.app/
-**API:** https://your-railway-url-here
 
 ---
 
