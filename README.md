@@ -42,3 +42,15 @@ I built this to practice working with real open data sources and to get comforta
 ---
 
 ## Project structure
+regina-air-quality/
+├── backend/
+│ ├── main.py # FastAPI app — AQHI, wind, history endpoints
+│ ├── requirements.txt
+│ └── Procfile # Railway start command
+└── frontend/
+└── src/
+├── App.jsx # Root component, data fetching, theme state
+├── AQHICard.jsx # Current reading card with health advice
+├── HistoryChart.jsx # 7-day line chart (Recharts)
+├── WindMap.jsx # Leaflet map + canvas particle animation
+└── index.css # CSS custom properties for dark/light theme
