@@ -43,7 +43,7 @@ I built this to practice working with real open data sources and to get comforta
 
 ## Project structure
 
-
+```
 regina-air-quality/
 ├── backend/
 │   ├── main.py          # FastAPI app — AQHI, wind, history endpoints
@@ -59,3 +59,69 @@ regina-air-quality/
         ├── HistoryChart.jsx # 7-day line chart (Recharts)
         ├── WindMap.jsx      # Leaflet map + canvas particle animation
         ├── main.jsx
+        └── index.css        # CSS custom properties for dark/light theme
+```
+
+---
+
+## Running locally
+
+**Backend**
+
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+Runs on `http://localhost:8000`. Test endpoints:
+- `/api/current` — live AQHI reading for Regina
+- `/api/history` — last 7 days of hourly readings
+- `/api/wind` — live wind speed and direction
+
+**Frontend**
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Runs on `http://localhost:5173`. Expects the backend on `localhost:8000`.
+
+**Running both at once**
+
+```bash
+./start.sh
+```
+
+---
+
+## How the history chart works
+
+Environment Canada's AQHI realtime feed only keeps a short rolling window — not a guaranteed full 7 days. The backend works around this by logging every reading it fetches into a local SQLite file (`history.db`). When `/api/history` is called, it merges the government feed's current window with everything in the local log, then returns up to 168 hours (7 days) of readings sorted by time. The chart fills in more completely the longer the backend stays running.
+
+---
+
+## How the wind animation works
+
+The map uses a `<canvas>` element layered on top of a Leaflet map via an absolute-positioned overlay. Each frame, the canvas is fully cleared with `clearRect` (not a semi-transparent fill — that was causing the map tiles to darken progressively). Seventy particles move across the canvas in the direction the wind is actually blowing, each trailing a fading line of up to 10 segments. When a particle crosses an edge, its trail is wiped so it doesn't draw a glitch line across the whole map. Wind direction comes from Open-Meteo's current weather endpoint using Regina's coordinates.
+
+---
+
+## Known limitations
+
+- The wind map applies one wind reading uniformly across the whole city. A real gridded wind field would require pulling forecast model data (e.g. Environment Canada's HRDPS or NOAA's GFS) — a meaningful next step but a much larger pipeline
+- `history.db` doesn't persist across Railway redeploys on the free tier. Locally it builds up correctly across sessions. Fixing this properly would mean swapping SQLite for a persistent hosted database
+
+---
+
+## Possible next steps
+
+- Pull a real wind vector grid instead of a single point reading
+- Add a forecast tab using Environment Canada's AQHI forecast endpoint
+- Swap SQLite for a persistent hosted Postgres database so history survives redeploys
+- Browser push notifications when AQHI spikes above a threshold
+- Progressive Web App (PWA) manifest so it can be installed on a phone's home screen
