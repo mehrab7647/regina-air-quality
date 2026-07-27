@@ -3,3 +3,5 @@ backend/history.db
 backend/__pycache__/
 frontend/node_modules/
 .DS_Store
+# Local Netlify folder
+.netlify
